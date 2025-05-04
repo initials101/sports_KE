@@ -8,7 +8,7 @@ import {
   addPlayerInjury,
   addPlayerSkill,
   getTopPlayers,
-} from '../controllers/playerController.js';
+} from '../controllers/player.controller.js';
 import { protect, authorize } from '../middleware/authMiddleware.js';
 
 const router = express.Router();

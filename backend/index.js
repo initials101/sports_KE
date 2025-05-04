@@ -9,11 +9,11 @@ import { createServer } from 'http';
 
 import connectDB from './config/db.js';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
-import userRoutes from './routes/userRoutes.js';
-import playerRoutes from './routes/playerRoutes.js';
-import clubRoutes from './routes/clubRoutes.js';
-import transferRoutes from './routes/transferRoutes.js';
-import analyticsRoutes from './routes/analyticsRoutes.js';
+import userRoutes from './routes/user.routes.js';
+import playerRoutes from './routes/player.routes.js';
+import clubRoutes from './routes/club.routes.js';
+import transferRoutes from './routes/transfer.routes.js';
+import analyticsRoutes from './routes/analytics.routes.js';
 
 // Load environment variables
 dotenv.config();
