@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-kenya-black: #000000;
+  --color-kenya-red: #EF4444;
+  --color-kenya-green: #15803D;
+  --color-kenya-white: #FFFFFF;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--color-kenya-white);
+  color: var(--color-kenya-black);
+}
+
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center justify-center;
+  }
+
+  .btn-primary {
+    @apply bg-kenya-green text-kenya-white hover:bg-kenya-green/90 hover:shadow-lg hover:scale-105;
+  }
+
+  .btn-secondary {
+    @apply bg-kenya-red text-kenya-white hover:bg-kenya-red/90 hover:shadow-lg hover:scale-105;
+  }
+
+  .card {
+    @apply bg-kenya-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-200;
+  }
+
+  .nav-link {
+    @apply text-gray-600 hover:text-kenya-green transition-colors duration-200 relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-kenya-green hover:after:w-full after:transition-all after:duration-200;
+  }
+}
