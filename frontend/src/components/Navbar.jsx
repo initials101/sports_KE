@@ -1,10 +1,14 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Shield, Menu, X, User } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+"use client"
+
+import { useState } from "react"
+import { Link } from "react-router-dom"
+import { Shield, Menu, X, User } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
+import { useSelector } from "react-redux"
 
 function Navbar() {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false)
+  const { user } = useSelector((state) => state.auth)
 
   return (
     <nav className="bg-kenya-white shadow-lg sticky top-0 z-50">
@@ -19,22 +23,37 @@ function Navbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link to="/" className="nav-link">Home</Link>
-            <Link to="/teams" className="nav-link">Teams</Link>
-            <Link to="/players" className="nav-link">Players</Link>
-            <Link to="/dashboard" className="nav-link">Dashboard</Link>
-            <button className="btn btn-primary flex items-center space-x-2">
-              <User size={18} />
-              <span>Sign In</span>
-            </button>
+            <Link to="/" className="nav-link">
+              Home
+            </Link>
+            <Link to="/teams" className="nav-link">
+              Teams
+            </Link>
+            <Link to="/players" className="nav-link">
+              Players
+            </Link>
+            <Link to="/transfers" className="nav-link">
+              Transfers
+            </Link>
+            <Link to="/scout-network" className="nav-link">
+              Scout Network
+            </Link>
+
+            {user ? (
+              <Link to="/dashboard" className="nav-link">
+                Dashboard
+              </Link>
+            ) : (
+              <Link to="/login" className="btn btn-primary flex items-center space-x-2">
+                <User size={18} />
+                <span>Sign In</span>
+              </Link>
+            )}
           </div>
 
           {/* Mobile menu button */}
           <div className="md:hidden">
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="text-gray-500 hover:text-kenya-green"
-            >
+            <button onClick={() => setIsOpen(!isOpen)} className="text-gray-500 hover:text-kenya-green">
               {isOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
@@ -46,7 +65,7 @@ function Navbar() {
         {isOpen && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
+            animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             className="md:hidden bg-white"
           >
@@ -73,22 +92,42 @@ function Navbar() {
                 Players
               </Link>
               <Link
-                to="/dashboard"
+                to="/transfers"
                 className="block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-50"
                 onClick={() => setIsOpen(false)}
               >
-                Dashboard
+                Transfers
               </Link>
-              <button className="w-full mt-4 btn btn-primary flex items-center justify-center space-x-2">
-                <User size={18} />
-                <span>Sign In</span>
-              </button>
+              <Link
+                to="/scout-network"
+                className="block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-50"
+                onClick={() => setIsOpen(false)}
+              >
+                Scout Network
+              </Link>
+              {user ? (
+                <Link
+                  to="/dashboard"
+                  className="block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-50"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Dashboard
+                </Link>
+              ) : (
+                <Link
+                  to="/login"
+                  className="block px-3 py-2 rounded-md text-base font-medium bg-kenya-green text-white mt-4"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Sign In
+                </Link>
+              )}
             </div>
           </motion.div>
         )}
       </AnimatePresence>
     </nav>
-  );
+  )
 }
 
-export default Navbar;
+export default Navbar
