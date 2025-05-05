@@ -1,46 +1,23 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
-import axios from "axios"
+import { scoutAPI } from "../../services/api"
 
 // Get all scouts
-export const fetchScouts = createAsyncThunk(
-  "scouts/fetchScouts",
-  async ({ page = 1, limit = 10, region = undefined }, { rejectWithValue }) => {
-    try {
-      const config = {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-
-      let url = `/api/scouts?page=${page}&limit=${limit}`
-      if (region && region !== "all") {
-        url += `&region=${region}`
-      }
-
-      const { data } = await axios.get(url, config)
-      return data
-    } catch (error) {
-      return rejectWithValue(
-        error.response && error.response.data.message ? error.response.data.message : error.message,
-      )
-    }
-  },
-)
+export const fetchScouts = createAsyncThunk("scouts/fetchScouts", async (params = {}, { rejectWithValue }) => {
+  try {
+    const { data } = await scoutAPI.getScouts(params)
+    return data
+  } catch (error) {
+    return rejectWithValue(error.response?.data?.message || error.message)
+  }
+})
 
 // Get scout by ID
 export const fetchScoutById = createAsyncThunk("scouts/fetchScoutById", async (id, { rejectWithValue }) => {
   try {
-    const config = {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    }
-
-    const { data } = await axios.get(`/api/scouts/${id}`, config)
+    const { data } = await scoutAPI.getScoutById(id)
     return data
   } catch (error) {
-    return rejectWithValue(error.response && error.response.data.message ? error.response.data.message : error.message)
+    return rejectWithValue(error.response?.data?.message || error.message)
   }
 })
 
@@ -49,19 +26,10 @@ export const updateScoutProfile = createAsyncThunk(
   "scouts/updateScoutProfile",
   async (profileData, { rejectWithValue }) => {
     try {
-      const config = {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-
-      const { data } = await axios.put("/api/scouts/profile", profileData, config)
+      const { data } = await scoutAPI.updateScoutProfile(profileData)
       return data
     } catch (error) {
-      return rejectWithValue(
-        error.response && error.response.data.message ? error.response.data.message : error.message,
-      )
+      return rejectWithValue(error.response?.data?.message || error.message)
     }
   },
 )
@@ -69,17 +37,10 @@ export const updateScoutProfile = createAsyncThunk(
 // Connect with scout
 export const connectWithScout = createAsyncThunk("scouts/connectWithScout", async (scoutId, { rejectWithValue }) => {
   try {
-    const config = {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    }
-
-    const { data } = await axios.post(`/api/scouts/${scoutId}/connect`, {}, config)
+    const { data } = await scoutAPI.connectWithScout(scoutId)
     return data
   } catch (error) {
-    return rejectWithValue(error.response && error.response.data.message ? error.response.data.message : error.message)
+    return rejectWithValue(error.response?.data?.message || error.message)
   }
 })
 
@@ -88,19 +49,10 @@ export const respondToConnection = createAsyncThunk(
   "scouts/respondToConnection",
   async ({ connectionId, status }, { rejectWithValue }) => {
     try {
-      const config = {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-
-      const { data } = await axios.put(`/api/scouts/connections/${connectionId}`, { status }, config)
+      const { data } = await scoutAPI.respondToConnection(connectionId, status)
       return { ...data, connectionId }
     } catch (error) {
-      return rejectWithValue(
-        error.response && error.response.data.message ? error.response.data.message : error.message,
-      )
+      return rejectWithValue(error.response?.data?.message || error.message)
     }
   },
 )

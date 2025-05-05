@@ -1,46 +1,23 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
-import axios from "axios"
+import { transferAPI } from "../../services/api"
 
 // Get all transfers
-export const fetchTransfers = createAsyncThunk(
-  "transfers/fetchTransfers",
-  async ({ page = 1, limit = 10, status = undefined }, { rejectWithValue }) => {
-    try {
-      const config = {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-
-      let url = `/api/transfers?page=${page}&limit=${limit}`
-      if (status) {
-        url += `&status=${status}`
-      }
-
-      const { data } = await axios.get(url, config)
-      return data
-    } catch (error) {
-      return rejectWithValue(
-        error.response && error.response.data.message ? error.response.data.message : error.message,
-      )
-    }
-  },
-)
+export const fetchTransfers = createAsyncThunk("transfers/fetchTransfers", async (params = {}, { rejectWithValue }) => {
+  try {
+    const { data } = await transferAPI.getTransfers(params)
+    return data
+  } catch (error) {
+    return rejectWithValue(error.response?.data?.message || error.message)
+  }
+})
 
 // Get transfer by ID
 export const fetchTransferById = createAsyncThunk("transfers/fetchTransferById", async (id, { rejectWithValue }) => {
   try {
-    const config = {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    }
-
-    const { data } = await axios.get(`/api/transfers/${id}`, config)
+    const { data } = await transferAPI.getTransferById(id)
     return data
   } catch (error) {
-    return rejectWithValue(error.response && error.response.data.message ? error.response.data.message : error.message)
+    return rejectWithValue(error.response?.data?.message || error.message)
   }
 })
 
@@ -49,19 +26,10 @@ export const createTransfer = createAsyncThunk(
   "transfers/createTransfer",
   async (transferData, { rejectWithValue }) => {
     try {
-      const config = {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-
-      const { data } = await axios.post("/api/transfers", transferData, config)
+      const { data } = await transferAPI.createTransfer(transferData)
       return data
     } catch (error) {
-      return rejectWithValue(
-        error.response && error.response.data.message ? error.response.data.message : error.message,
-      )
+      return rejectWithValue(error.response?.data?.message || error.message)
     }
   },
 )
@@ -71,19 +39,10 @@ export const updateTransferStatus = createAsyncThunk(
   "transfers/updateTransferStatus",
   async ({ id, status }, { rejectWithValue }) => {
     try {
-      const config = {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-
-      const { data } = await axios.put(`/api/transfers/${id}/status`, { status }, config)
+      const { data } = await transferAPI.updateTransferStatus(id, status)
       return data
     } catch (error) {
-      return rejectWithValue(
-        error.response && error.response.data.message ? error.response.data.message : error.message,
-      )
+      return rejectWithValue(error.response?.data?.message || error.message)
     }
   },
 )
@@ -93,19 +52,10 @@ export const submitNegotiation = createAsyncThunk(
   "transfers/submitNegotiation",
   async ({ id, negotiationData }, { rejectWithValue }) => {
     try {
-      const config = {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-
-      const { data } = await axios.post(`/api/transfers/${id}/negotiations`, negotiationData, config)
+      const { data } = await transferAPI.submitNegotiation(id, negotiationData)
       return data
     } catch (error) {
-      return rejectWithValue(
-        error.response && error.response.data.message ? error.response.data.message : error.message,
-      )
+      return rejectWithValue(error.response?.data?.message || error.message)
     }
   },
 )
@@ -115,19 +65,10 @@ export const acceptNegotiation = createAsyncThunk(
   "transfers/acceptNegotiation",
   async ({ transferId, negotiationId }, { rejectWithValue }) => {
     try {
-      const config = {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-
-      const { data } = await axios.put(`/api/transfers/${transferId}/negotiations/${negotiationId}/accept`, {}, config)
+      const { data } = await transferAPI.acceptNegotiation(transferId, negotiationId)
       return data
     } catch (error) {
-      return rejectWithValue(
-        error.response && error.response.data.message ? error.response.data.message : error.message,
-      )
+      return rejectWithValue(error.response?.data?.message || error.message)
     }
   },
 )

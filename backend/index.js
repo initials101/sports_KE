@@ -2,6 +2,7 @@ import express from "express"
 import dotenv from "dotenv"
 import morgan from "morgan"
 import path from "path"
+import cors from "cors"
 import { fileURLToPath } from "url"
 import connectDB from "./config/db.js"
 import { notFound, errorHandler } from "./middleware/errorMiddleware.js"
@@ -21,6 +22,9 @@ const app = express()
 
 // Body parser
 app.use(express.json())
+
+// Enable CORS
+app.use(cors())
 
 // Dev logging middleware
 if (process.env.NODE_ENV === "development") {
