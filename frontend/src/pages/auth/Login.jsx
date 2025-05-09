@@ -1,122 +1,154 @@
-import { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Shield, Mail, Lock, Loader } from 'lucide-react';
-import { setCredentials } from '../../store/slices/authSlice';
+"use client"
+
+import { useState, useEffect } from "react"
+import { useDispatch, useSelector } from "react-redux"
+import { Link, useNavigate } from "react-router-dom"
+import { motion } from "framer-motion"
+import { Shield, Mail, Lock, Eye, EyeOff } from "lucide-react"
+import { login, resetAuthState } from "../../store/slices/authSlice"
+
+// Import ShadCN components
+import { Button } from "../../components/ui/button"
+import { Input } from "../../components/ui/input"
+import { Label } from "../../components/ui/label"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../../components/ui/card"
+import { toast } from "../../components/ui/use-toast"
 
 function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const { isLoading, error } = useSelector((state) => state.auth);
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      // TODO: Implement actual login logic
-      const response = await fetch('/api/users/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-      
-      const data = await response.json();
-      
-      if (response.ok) {
-        dispatch(setCredentials(data));
-        navigate('/dashboard');
-      }
-    } catch (err) {
-      console.error('Login failed:', err);
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+
+  const { user, isLoading, error, success } = useSelector((state) => state.auth)
+
+  useEffect(() => {
+    // If user is already logged in, redirect to dashboard
+    if (user) {
+      navigate("/dashboard")
     }
-  };
+
+    // Reset auth state when component unmounts
+    return () => {
+      dispatch(resetAuthState())
+    }
+  }, [user, navigate, dispatch])
+
+  useEffect(() => {
+    if (error) {
+      toast({
+        title: "Error",
+        description: error,
+        variant: "destructive",
+      })
+    }
+
+    if (success) {
+      toast({
+        title: "Success",
+        description: "You have successfully logged in!",
+        variant: "success",
+      })
+      navigate("/dashboard")
+    }
+  }, [error, success, navigate])
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+
+    // Validate form
+    if (!email || !password) {
+      toast({
+        title: "Error",
+        description: "Please fill in all fields",
+        variant: "destructive",
+      })
+      return
+    }
+
+    // Dispatch login action
+    dispatch(login({ email, password }))
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <motion.div
-        className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="max-w-md w-full"
       >
-        <div className="text-center">
-          <Shield className="mx-auto h-12 w-12 text-kenya-green" />
-          <h2 className="mt-6 text-3xl font-bold text-gray-900">Welcome back</h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Don't have an account?{' '}
-            <Link to="/register" className="text-kenya-green hover:text-kenya-green/90">
-              Sign up
-            </Link>
-          </p>
+        <div className="flex justify-center mb-6">
+          <Shield className="h-12 w-12 text-kenya-green" />
         </div>
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {error && (
-            <div className="bg-red-50 text-red-500 p-3 rounded-lg text-sm">
-              {error}
-            </div>
-          )}
-
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="email" className="sr-only">
-                Email address
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="appearance-none rounded-lg relative block w-full pl-10 pr-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-kenya-green focus:border-kenya-green sm:text-sm"
-                  placeholder="Email address"
-                />
+        <Card>
+          <CardHeader className="space-y-1">
+            <CardTitle className="text-2xl font-bold text-center">Sign in to your account</CardTitle>
+            <CardDescription className="text-center">
+              Enter your email and password to access the Kenya Football Connect platform
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="your.email@example.com"
+                    className="pl-10"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </div>
               </div>
-            </div>
-
-            <div>
-              <label htmlFor="password" className="sr-only">
-                Password
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="appearance-none rounded-lg relative block w-full pl-10 pr-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-kenya-green focus:border-kenya-green sm:text-sm"
-                  placeholder="Password"
-                />
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <Label htmlFor="password">Password</Label>
+                  <Link to="/forgot-password" className="text-sm text-kenya-green hover:underline">
+                    Forgot password?
+                  </Link>
+                </div>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    className="pl-10 pr-10"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
               </div>
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? "Signing in..." : "Sign in"}
+              </Button>
+            </form>
+          </CardContent>
+          <CardFooter className="flex flex-col space-y-4">
+            <div className="text-center text-sm">
+              Don't have an account?{" "}
+              <Link to="/register" className="text-kenya-green hover:underline">
+                Sign up
+              </Link>
             </div>
-          </div>
-
-          <div>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="btn btn-primary w-full py-3 relative"
-            >
-              {isLoading ? (
-                <Loader className="animate-spin h-5 w-5" />
-              ) : (
-                'Sign in'
-              )}
-            </button>
-          </div>
-        </form>
+          </CardFooter>
+        </Card>
       </motion.div>
     </div>
-  );
+  )
 }
 
-export default Login;
+export default Login
