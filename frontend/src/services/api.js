@@ -1,8 +1,8 @@
 import axios from "axios"
 
-// Create axios instance with base URL
+// If using Vite proxy, update the baseURL to use the proxy
 const API = axios.create({
-  baseURL: "/api",
+  baseURL: "/api", // This will be proxied to http://localhost:5000/api
   headers: {
     "Content-Type": "application/json",
   },
@@ -37,7 +37,7 @@ API.interceptors.response.use(
 // Auth services
 export const authAPI = {
   login: (credentials) => API.post("/users/login", credentials),
-  register: (userData) => API.post("/users/register", userData),
+  register: (userData) => API.post("/users", userData),
   getUserProfile: () => API.get("/users/profile"),
   updateUserProfile: (userData) => API.put("/users/profile", userData),
 }
@@ -47,12 +47,17 @@ export const playerAPI = {
   getPlayers: (params) => API.get("/players", { params }),
   getPlayerById: (id) => API.get(`/players/${id}`),
   updatePlayer: (id, playerData) => API.put(`/players/${id}`, playerData),
+  createPlayer: (playerData) => API.post("/players", playerData),
+  deletePlayer: (id) => API.delete(`/players/${id}`),
 }
 
 // Club services
 export const clubAPI = {
   getClubs: (params) => API.get("/clubs", { params }),
   getClubById: (id) => API.get(`/clubs/${id}`),
+  createClub: (clubData) => API.post("/clubs", clubData),
+  updateClub: (id, clubData) => API.put(`/clubs/${id}`, clubData),
+  deleteClub: (id) => API.delete(`/clubs/${id}`),
 }
 
 // Transfer services

@@ -1,26 +1,26 @@
-import express from 'express';
+import express from "express"
 import {
   getPlayers,
   getPlayerById,
   createPlayer,
   updatePlayer,
   deletePlayer,
-  addPlayerInjury,
   addPlayerSkill,
-  getTopPlayers,
-} from '../controllers/player.controller.js';
-import { protect, authorize } from '../middleware/authMiddleware.js';
+  addPlayerStatistic,
+} from "../controllers/player.controller.js"
+import { protect, authorize } from "../middleware/authMiddleware.js"
 
-const router = express.Router();
+const router = express.Router()
 
-router.route('/').get(getPlayers).post(protect, createPlayer);
-router.get('/top', getTopPlayers);
+router.route("/").get(getPlayers).post(protect, createPlayer)
+
 router
-  .route('/:id')
+  .route("/:id")
   .get(getPlayerById)
   .put(protect, updatePlayer)
-  .delete(protect, authorize('admin'), deletePlayer);
-router.route('/:id/injuries').post(protect, addPlayerInjury);
-router.route('/:id/skills').post(protect, addPlayerSkill);
+  .delete(protect, authorize(["admin"]), deletePlayer)
 
-export default router;
+router.route("/:id/skills").post(protect, addPlayerSkill)
+router.route("/:id/statistics").post(protect, addPlayerStatistic)
+
+export default router

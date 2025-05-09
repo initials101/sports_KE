@@ -6,7 +6,7 @@ import {
   updateTransferStatus,
   submitNegotiation,
   acceptNegotiation,
-} from "../controllers/transferController.js"
+} from "../controllers/transfer.controller.js"
 import { protect, authorize } from "../middleware/authMiddleware.js"
 
 const router = express.Router()

@@ -1,0 +1,17 @@
+{
+    "name": "kenya-football-management",
+    "version": "1.0.0",
+    "description": "A centralized platform for managing football players in Kenya",
+    "type": "module",
+    "scripts": {
+      "dev:server": "cd backend && npm run dev",
+      "dev:client": "cd frontend && npm run dev",
+      "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+      "start": "node backend/server.js",
+      "build": "cd frontend && npm install && npm run build"
+    },
+    "dependencies": {
+      "concurrently": "^8.2.2"
+    }
+  }
+  

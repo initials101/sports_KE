@@ -5,7 +5,7 @@ import {
   updateScoutProfile,
   connectWithScout,
   respondToConnection,
-} from "../controllers/scoutController.js"
+} from "../controllers/scout.controller.js"
 import { protect, authorize } from "../middleware/authMiddleware.js"
 
 const router = express.Router()

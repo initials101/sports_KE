@@ -1,116 +1,98 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose"
 
 const clubSchema = mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, 'Please add a club name'],
-      unique: true,
+      required: true,
+    },
+    shortName: {
+      type: String,
     },
     founded: {
       type: Number,
     },
     logo: {
       type: String,
-      default: 'default-club-logo.jpg',
     },
     coverImage: {
       type: String,
-      default: 'default-club-cover.jpg',
-    },
-    primaryColor: {
-      type: String,
-      default: '#000000',
-    },
-    secondaryColor: {
-      type: String,
-      default: '#FFFFFF',
     },
     stadium: {
-      name: String,
-      capacity: Number,
+      name: {
+        type: String,
+      },
+      capacity: {
+        type: Number,
+      },
       location: {
-        type: {
-          type: String,
-          enum: ['Point'],
-        },
-        coordinates: {
-          type: [Number],
-          index: '2dsphere',
-        },
-        address: String,
-        city: String,
-        county: String,
+        type: String,
+      },
+      image: {
+        type: String,
+      },
+    },
+    location: {
+      city: {
+        type: String,
+      },
+      country: {
+        type: String,
+        default: "Kenya",
       },
     },
     league: {
       type: String,
-      enum: [
-        'Kenya Premier League',
-        'National Super League',
-        'Division One',
-        'County League',
-        'Other',
-      ],
-      required: true,
-    },
-    manager: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
     },
     website: {
       type: String,
     },
-    socialMedia: {
-      twitter: String,
-      facebook: String,
-      instagram: String,
-    },
-    contact: {
-      email: String,
-      phone: String,
-    },
-    trophies: [
-      {
-        name: String,
-        year: Number,
-        description: String,
+    colors: {
+      primary: {
+        type: String,
       },
-    ],
-    budget: {
-      type: Number,
-      default: 0,
+      secondary: {
+        type: String,
+      },
     },
-    isActive: {
-      type: Boolean,
-      default: true,
+    manager: {
+      name: {
+        type: String,
+      },
+      nationality: {
+        type: String,
+      },
+      appointedDate: {
+        type: Date,
+      },
+    },
+    description: {
+      type: String,
+    },
+    socialMedia: {
+      facebook: {
+        type: String,
+      },
+      twitter: {
+        type: String,
+      },
+      instagram: {
+        type: String,
+      },
     },
   },
   {
     timestamps: true,
-    toJSON: { virtuals: true },
-    toObject: { virtuals: true },
-  }
-);
-
-// Reverse populate with players
-clubSchema.virtual('players', {
-  ref: 'Player',
-  localField: '_id',
-  foreignField: 'currentClub',
-  justOne: false,
-});
-
-// Reverse populate with matches
-clubSchema.virtual('matches', {
-  ref: 'Match',
-  localField: '_id',
-  foreignField: {
-    $in: ['homeTeam', 'awayTeam'],
   },
-  justOne: false,
-});
+)
 
-const Club = mongoose.model('Club', clubSchema);
+// Virtual for getting players in the club
+clubSchema.virtual("players", {
+  ref: "Player",
+  localField: "_id",
+  foreignField: "currentClub",
+})
 
-export default Club;
+const Club = mongoose.model("Club", clubSchema)
+
+export default Club

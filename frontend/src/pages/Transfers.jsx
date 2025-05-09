@@ -32,9 +32,15 @@ import { toast } from "../components/ui/use-toast"
 function Transfers() {
   const dispatch = useDispatch()
   const { user } = useSelector((state) => state.auth)
-  const { transfers, isLoading, error, success, pagination } = useSelector((state) => state.transfers)
-  const { players } = useSelector((state) => state.players)
-  const { clubs } = useSelector((state) => state.clubs)
+  const {
+    transfers = [],
+    isLoading = false,
+    error = null,
+    success = false,
+    pagination = {},
+  } = useSelector((state) => state.transfers || {})
+  const { players = [] } = useSelector((state) => state.players || {})
+  const { clubs = [] } = useSelector((state) => state.clubs || {})
 
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
@@ -52,7 +58,11 @@ function Transfers() {
 
   useEffect(() => {
     dispatch(
-      fetchTransfers({ page: currentPage, limit: 10, status: statusFilter !== "all" ? statusFilter : undefined }),
+      fetchTransfers({
+        page: currentPage,
+        limit: 10,
+        status: statusFilter !== "all" ? statusFilter : undefined,
+      }),
     )
   }, [dispatch, currentPage, statusFilter])
 
@@ -118,10 +128,10 @@ function Transfers() {
   const filteredTransfers = transfers.filter((transfer) => {
     const matchesSearch =
       searchQuery === "" ||
-      transfer.player?.firstName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      transfer.player?.lastName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      transfer.fromClub?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      transfer.toClub?.name?.toLowerCase().includes(searchQuery.toLowerCase())
+      (transfer.player?.firstName && transfer.player.firstName.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (transfer.player?.lastName && transfer.player.lastName.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (transfer.fromClub?.name && transfer.fromClub.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (transfer.toClub?.name && transfer.toClub.name.toLowerCase().includes(searchQuery.toLowerCase()))
 
     return matchesSearch
   })
@@ -182,7 +192,7 @@ function Transfers() {
     }
   }
 
-  if (isLoading && transfers.length === 0) {
+  if (isLoading && (!transfers || transfers.length === 0)) {
     return (
       <div className="flex justify-center items-center h-96">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-kenya-green"></div>
@@ -396,7 +406,7 @@ function Transfers() {
 
         <TabsContent value="grid">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredTransfers.length > 0 ? (
+            {filteredTransfers && filteredTransfers.length > 0 ? (
               filteredTransfers.map((transfer) => (
                 <motion.div
                   key={transfer._id}
@@ -412,15 +422,15 @@ function Transfers() {
                         <Avatar>
                           <AvatarImage src={transfer.player?.coverImage || "/placeholder.svg"} />
                           <AvatarFallback>
-                            {transfer.player?.firstName?.charAt(0)}
-                            {transfer.player?.lastName?.charAt(0)}
+                            {transfer.player?.firstName?.charAt(0) || ""}
+                            {transfer.player?.lastName?.charAt(0) || ""}
                           </AvatarFallback>
                         </Avatar>
                         <div>
                           <h3 className="font-bold">
-                            {transfer.player?.firstName} {transfer.player?.lastName}
+                            {transfer.player?.firstName || ""} {transfer.player?.lastName || ""}
                           </h3>
-                          <p className="text-sm text-gray-500">{transfer.player?.position}</p>
+                          <p className="text-sm text-gray-500">{transfer.player?.position || ""}</p>
                         </div>
                       </div>
                       {getStatusBadge(transfer.status)}
@@ -432,9 +442,9 @@ function Transfers() {
                         <div className="flex flex-col items-center">
                           <Avatar className="h-10 w-10">
                             <AvatarImage src={transfer.fromClub?.logo || "/placeholder.svg"} />
-                            <AvatarFallback>{transfer.fromClub?.name?.charAt(0)}</AvatarFallback>
+                            <AvatarFallback>{transfer.fromClub?.name?.charAt(0) || ""}</AvatarFallback>
                           </Avatar>
-                          <p className="text-sm mt-1">{transfer.fromClub?.name}</p>
+                          <p className="text-sm mt-1">{transfer.fromClub?.name || ""}</p>
                         </div>
                       </div>
 
@@ -445,9 +455,9 @@ function Transfers() {
                         <div className="flex flex-col items-center">
                           <Avatar className="h-10 w-10">
                             <AvatarImage src={transfer.toClub?.logo || "/placeholder.svg"} />
-                            <AvatarFallback>{transfer.toClub?.name?.charAt(0)}</AvatarFallback>
+                            <AvatarFallback>{transfer.toClub?.name?.charAt(0) || ""}</AvatarFallback>
                           </Avatar>
-                          <p className="text-sm mt-1">{transfer.toClub?.name}</p>
+                          <p className="text-sm mt-1">{transfer.toClub?.name || ""}</p>
                         </div>
                       </div>
                     </div>
@@ -455,21 +465,23 @@ function Transfers() {
                     <div className="flex justify-between items-center mb-4">
                       <div>
                         <p className="text-xs text-gray-500">Asking Price</p>
-                        <p className="font-semibold">${transfer.askingPrice?.toLocaleString()}</p>
+                        <p className="font-semibold">${transfer.askingPrice?.toLocaleString() || "0"}</p>
                       </div>
                       <div>
                         <p className="text-xs text-gray-500">Type</p>
-                        <p className="font-semibold capitalize">{transfer.transferType}</p>
+                        <p className="font-semibold capitalize">{transfer.transferType || "permanent"}</p>
                       </div>
                     </div>
 
                     <div className="flex justify-between items-center">
                       <p className="text-xs text-gray-500">
-                        {new Date(transfer.createdAt).toLocaleDateString("en-US", {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                        })}
+                        {transfer.createdAt
+                          ? new Date(transfer.createdAt).toLocaleDateString("en-US", {
+                              year: "numeric",
+                              month: "short",
+                              day: "numeric",
+                            })
+                          : ""}
                       </p>
                       <Button variant="outline" asChild>
                         <Link to={`/transfers/${transfer._id}`}>View Details</Link>
@@ -504,7 +516,7 @@ function Transfers() {
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredTransfers.length > 0 ? (
+                    {filteredTransfers && filteredTransfers.length > 0 ? (
                       filteredTransfers.map((transfer) => (
                         <tr key={transfer._id} className="border-b hover:bg-muted/50">
                           <td className="py-3 px-4">
@@ -512,34 +524,36 @@ function Transfers() {
                               <Avatar className="h-8 w-8">
                                 <AvatarImage src={transfer.player?.coverImage || "/placeholder.svg"} />
                                 <AvatarFallback>
-                                  {transfer.player?.firstName?.charAt(0)}
-                                  {transfer.player?.lastName?.charAt(0)}
+                                  {transfer.player?.firstName?.charAt(0) || ""}
+                                  {transfer.player?.lastName?.charAt(0) || ""}
                                 </AvatarFallback>
                               </Avatar>
                               <div>
                                 <p className="font-medium">
-                                  {transfer.player?.firstName} {transfer.player?.lastName}
+                                  {transfer.player?.firstName || ""} {transfer.player?.lastName || ""}
                                 </p>
-                                <p className="text-xs text-gray-500">{transfer.player?.position}</p>
+                                <p className="text-xs text-gray-500">{transfer.player?.position || ""}</p>
                               </div>
                             </div>
                           </td>
-                          <td className="py-3 px-4">{transfer.fromClub?.name}</td>
-                          <td className="py-3 px-4">{transfer.toClub?.name}</td>
-                          <td className="py-3 px-4 capitalize">{transfer.transferType}</td>
-                          <td className="py-3 px-4">${transfer.askingPrice?.toLocaleString()}</td>
+                          <td className="py-3 px-4">{transfer.fromClub?.name || ""}</td>
+                          <td className="py-3 px-4">{transfer.toClub?.name || ""}</td>
+                          <td className="py-3 px-4 capitalize">{transfer.transferType || "permanent"}</td>
+                          <td className="py-3 px-4">${transfer.askingPrice?.toLocaleString() || "0"}</td>
                           <td className="py-3 px-4">
                             <div className="flex items-center gap-2">
                               {getStatusIcon(transfer.status)}
-                              <span className="capitalize">{transfer.status}</span>
+                              <span className="capitalize">{transfer.status || ""}</span>
                             </div>
                           </td>
                           <td className="py-3 px-4">
-                            {new Date(transfer.createdAt).toLocaleDateString("en-US", {
-                              year: "numeric",
-                              month: "short",
-                              day: "numeric",
-                            })}
+                            {transfer.createdAt
+                              ? new Date(transfer.createdAt).toLocaleDateString("en-US", {
+                                  year: "numeric",
+                                  month: "short",
+                                  day: "numeric",
+                                })
+                              : ""}
                           </td>
                           <td className="py-3 px-4">
                             <Button variant="outline" size="sm" asChild>
@@ -564,7 +578,7 @@ function Transfers() {
       </Tabs>
 
       {/* Pagination */}
-      {pagination.pages > 1 && (
+      {pagination && pagination.pages > 1 && (
         <div className="flex justify-center mt-8">
           <div className="flex gap-2">
             <Button
