@@ -11,7 +11,7 @@ function Footer() {
             <div className="flex items-center space-x-2 mb-4">
               <Shield className="h-8 w-8 text-kenya-green" />
               <span className="text-xl font-bold bg-gradient-to-r from-kenya-green to-kenya-red bg-clip-text text-transparent">
-                Futaa_KE
+                Futaa Yetu
               </span>
             </div>
             <p className="text-gray-600 mb-4">
