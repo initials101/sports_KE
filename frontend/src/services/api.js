@@ -1,6 +1,5 @@
 import axios from "axios"
 
-// If using Vite proxy, update the baseURL to use the proxy
 const API = axios.create({
   baseURL: "/api", // This will be proxied to http://localhost:5000/api
   headers: {
